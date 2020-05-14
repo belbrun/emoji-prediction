@@ -2,10 +2,12 @@ import sklearn
 import numpy as np
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.multiclass import OneVsRestClassifier
 
-def generate_ngrams(X, max_n_gram = 4):
-    counter = CountVectorizer(ngram_range = (1, max_n_gram), lowercase = True, min_df = 2)
+def generate_ngrams(X, max_n_gram=4):
+    counter = CountVectorizer(ngram_range=(1, max_n_gram),
+                              lowercase=True,
+                              min_df=2,
+                              stop_words='english')
     ngrams = counter.fit_transform(X)
     return ngrams
 
