@@ -1,17 +1,10 @@
 import data
 import preprocess
 import model
+import joblib
 
-def baseline_pipeline(X, y):
-    #preprocess
-    ngrams = preprocess.generate_ngrams(X)
-    print('{}'.format(ngrams.shape))
-
-    scaled_ngrams = preprocess.tf_idf_scaling(ngrams)
-
-    #train
-    y_pred = model.train_transform(scaled_ngrams, y)
-    return y_pred
+from preprocess import Preprocess
+from model import Baseline
 
 class Pipeline():
 
@@ -19,7 +12,7 @@ class Pipeline():
         self.steps = []
 
     def add(self, step):
-        self.steps.append()
+        self.steps.append(step)
 
     def train(self):
         pass
@@ -30,22 +23,25 @@ class Pipeline():
 
 class BaselinePipeline(Pipeline):
 
-    def __init__(self):
+    def __init__(self, C, k):
         super().__init__()
-        self.add(preprocess.generate_ngrams())
-        self.add(preprocess.tf_idf_scaling())
-        self.add(model.Baseline(C=0.1))
+        self.preprocess = Preprocess(k=k)
+        self.model = Baseline(C=C)
 
-    def train(self, X, y):
-        for step in self.steps:
-            if not issubclass(step.__class__, model.Model) :
-                X = step(X)
-            else :
-                X = step.train(X, y)
+    def train(self, X_train, y_train, max_n_gram=4):
+        X = self.preprocess.train(X_train, y_train, max_n_gram)
+        self.model.train(X, y_train) 
 
-    def run(self, X):
-        for step in self.steps:
-            if not issubclass(step.__class__, model.Model) :
-                X = step(X)
-            else :
-                X = step.output(X, y)
+    def run(self, X_test):
+        ngrams = self.preprocess.run(X_test)
+        return self.model.output(ngrams)
+
+    def save(self, model_file, preprocess_file):
+        joblib.dump(self.model, model_file)
+        joblib.dump(self.preprocess, preprocess_file)
+
+    def load_model(self, filename):
+        self.model = joblib.load(filename)
+    
+    def load_preprocess(self, filename):
+        self.preprocess = joblib.load(filename)
