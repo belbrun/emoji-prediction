@@ -35,19 +35,36 @@ class Baseline(Model):
 class RNN(nn.Module):
 
     def __init__(self):
-        super().__init__()
+        super().__init__(input_size, hidden_size, num_layers, dropout=0, f_size)
         self.activation = nn.ReLU()
         self.criterion = nn.CrossEntropyLoss()
-        self.lstm = nn.LSTM(input_size=200, hidden_size=300, num_layers=2,
-                            dropout=0, bidirectional=True)
-        self.fc1 = nn.Linear(305, 100)
+        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
+                            num_layers=num_layers, dropout=dropout,
+                            bidirectional=True)
+        self.fc1 = nn.Linear(hidden_size + f_size, 100)
         self.fc2 = nn.Linear(100, 20)
 
-    def forward(self, x, data):
-        #preprocess to time first, random initi h0 and c0?
+    def forward(self, x, f):
+        # preprocess to time first, random initi h0 and c0?
         _, (h, _) = self.lstm(x)
-        x = torch.cat((x, data), dim=1)
+        x = torch.cat((h[-1], f), dim=1)
         x = self.fc1(x)
         x = self.activation(x)
         x = self.fc2(x)
         return x
+
+    def train(self, batch):
+        self.train()
+        self.zero_grad()
+        x, y, f = batch
+        logits = self(x, f)
+        loss = self.criterion(logits, y)
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+        optimizer.step()
+        return loss.detach().item()
+
+    def evaluate(self, x, f):
+        model.eval()
+        with torch.no_grad():
+            return self(x, f)
