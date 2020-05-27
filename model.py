@@ -45,7 +45,7 @@ class RNN(nn.Module):
 
     def forward(self, x, f):
         # preprocess to time first, random initi h0 and c0?
-
+        x = x.permute(1, 0, 2)
         _, (h, _) = self.lstm(x)
         x = torch.cat((h[-2], h[-1], f), dim=1)
         x = self.fc1(x)
