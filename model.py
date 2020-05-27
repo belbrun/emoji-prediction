@@ -41,13 +41,14 @@ class RNN(nn.Module):
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
                             num_layers=num_layers, dropout=dropout,
                             bidirectional=True)
-        self.fc1 = nn.Linear(hidden_size + f_size, 100)
+        self.fc1 = nn.Linear(hidden_size*2 + f_size, 100)
         self.fc2 = nn.Linear(100, 20)
 
     def forward(self, x, f):
         # preprocess to time first, random initi h0 and c0?
+
         _, (h, _) = self.lstm(x)
-        x = torch.cat((h[-1], f), dim=1)
+        x = torch.cat((h[-2], h[-1], f), dim=1)
         x = self.fc1(x)
         x = self.activation(x)
         x = self.fc2(x)
