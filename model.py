@@ -35,7 +35,7 @@ class Baseline(Model):
 class RNN(nn.Module):
 
     def __init__(self):
-        super().__init__(input_size, hidden_size, num_layers, dropout=0, f_size)
+        super().__init__(input_size, hidden_size, num_layers, dropout, f_size)
         self.activation = nn.ReLU()
         self.criterion = nn.CrossEntropyLoss()
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
@@ -66,6 +66,6 @@ class RNN(nn.Module):
         return loss.detach().item()
 
     def evaluate(self, x, f):
-        model.eval()
+        self.eval()
         with torch.no_grad():
             return self(x, f)
