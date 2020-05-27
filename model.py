@@ -7,8 +7,6 @@ from sklearn.svm import SVC
 from sklearn.svm import LinearSVC
 from sklearn.metrics import classification_report, f1_score
 
-
-
 class Model():
 
     def __init__(self):
@@ -43,6 +41,7 @@ class RNN(nn.Module):
                             bidirectional=True)
         self.fc1 = nn.Linear(hidden_size*2 + f_size, 100)
         self.fc2 = nn.Linear(100, 20)
+        self.optimizer = torch.optim.SGD(self.parameters(), lr=0.01)
 
     def forward(self, x, f):
         # preprocess to time first, random initi h0 and c0?

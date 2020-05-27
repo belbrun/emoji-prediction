@@ -2,6 +2,7 @@ import data
 import preprocess
 import model
 import joblib
+import feature_extraction as fe
 
 from preprocess import Preprocess
 from model import Baseline, RNN
@@ -52,13 +53,13 @@ class RNNPipeline(Pipeline):
     def __init__(self):
         super().__init__()
         self.embedd = None #embeddings part should handle the padding for the batch
-        self.text_features = None
-        self.word_features = None
+        self.text_features = fe.text_features
+        self.word_features = fe.word_features
         self.model = RNN()
 
-    def train(data):
+    def train(self, data):
         avg_loss = 0
-        for batch_num, batch in enumerate(data):
+        for _, batch in enumerate(data):
             words, labels = batch
             x = self.embedd(words)
             x = torch.cat((x, self.word_features(words)), dim=1)
@@ -66,9 +67,9 @@ class RNNPipeline(Pipeline):
             loss = self.model.train(x, f)
         return avg_loss/len(data)
 
-    def evaluate(data):
+    def evaluate(self, data):
         y_ps, y_s = [], []
-        for batch_num, batch in enumerate(data):
+        for _, batch in enumerate(data):
             words, labels = batch
             y_s.append(labels)
             x = self.embedd(words)
