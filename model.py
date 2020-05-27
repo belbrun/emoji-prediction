@@ -7,8 +7,6 @@ from sklearn.svm import SVC
 from sklearn.svm import LinearSVC
 from sklearn.metrics import classification_report, f1_score
 
-
-
 class Model():
 
     def __init__(self):
@@ -34,8 +32,8 @@ class Baseline(Model):
 
 class RNN(nn.Module):
 
-    def __init__(self):
-        super().__init__(input_size, hidden_size, num_layers, dropout=0, f_size)
+    def __init__(self, input_size, hidden_size, num_layers, dropout, f_size):
+        super().__init__(input_size, hidden_size, num_layers, dropout)
         self.activation = nn.ReLU()
         self.criterion = nn.CrossEntropyLoss()
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
@@ -43,6 +41,7 @@ class RNN(nn.Module):
                             bidirectional=True)
         self.fc1 = nn.Linear(hidden_size + f_size, 100)
         self.fc2 = nn.Linear(100, 20)
+        self.optimizer = torch.optim.SGD(self.parameters(), lr=0.01)
 
     def forward(self, x, f):
         # preprocess to time first, random initi h0 and c0?
@@ -53,18 +52,20 @@ class RNN(nn.Module):
         x = self.fc2(x)
         return x
 
-    def train(self, batch):
-        self.train()
-        self.zero_grad()
-        x, y, f = batch
-        logits = self(x, f)
-        loss = self.criterion(logits, y)
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
-        optimizer.step()
-        return loss.detach().item()
+def train(model, batch):
+    model.train()
+    model.zero_grad()
+    
+    x, y, f = batch
+    logits = model(x, f)
+    loss = model.criterion(logits, y)
+    loss.backward()
+    torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
+    model.optimizer.step()
+    
+    return loss.detach().item()
 
-    def evaluate(self, x, f):
-        model.eval()
-        with torch.no_grad():
-            return self(x, f)
+def evaluate(model, x, f):
+    model.eval()
+    with torch.no_grad():
+        return model(x, f)

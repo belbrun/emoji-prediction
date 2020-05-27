@@ -35,6 +35,10 @@ if __name__ == '__main__':
     dl = get_dataloader('test', 10, True)
     X, y = load_data()
     print(X[0].split())
+    
     for data in dl:
-        print(data)
+        tweets = data[0]
+        labels = data[1]
+        for i in range(10):
+            print(tweets[i], labels[i])
         break
