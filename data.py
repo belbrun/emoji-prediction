@@ -15,6 +15,12 @@ def read_file(path):
     with open(path, 'r+', encoding = "utf-8") as file:
         return np.array(file.read().split('\n'))
 
+def write_log(log):
+    with open('log.txt', 'w+') as file:
+        for line in log:
+            file.write(str(line)+'\n')
+
+
 def load_data(set='test'):
     X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))
     y = read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels'))

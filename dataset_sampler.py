@@ -9,7 +9,7 @@ def read_file(path):
         return np.array(file.read().split('\n'))
 
 def save_file(path, data):
-    with open(path, 'w+') as file:
+    with open(path, 'w+', encoding = "utf-8") as file:
         for information in data:
             file.write(str(information)+'\n')
 

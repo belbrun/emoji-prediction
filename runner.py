@@ -58,6 +58,7 @@ def run_rnn():
     model_pipeline.evaluate(test_iter)
 
 
+
 params = {
     'embedding_dim': 100,
     'hidden_size': 200,
@@ -67,19 +68,21 @@ params = {
 }
 
 batch_size = 10
-n_epochs = 5
+n_epochs = 10
 
 def train_rnn():
+    log = []
     (train_data, valid_data, test_data), text_field = data.get_iterators(batch_size)
     pipe = RNNPipeline(params, text_field)
     for epoch in range(n_epochs):
         loss = pipe.train(train_data)
         y_p, y = pipe.evaluate(valid_data)
-        print('Epoch {}\n{}\n'.format(epoch, classification_report(y, y_p)))
+        log.append('Epoch {}\nLoss: {}\n{}\n'.format(epoch, loss, classification_report(y, y_p)))
+        print(log[-1])
     y_p, y = pipe.evaluate(test_data)
-    print(y_p.size())
-    print('Test\n{}\n'.format(classification_report(y, y_p)))
-
+    log.append('Test\n{}\n'.format(classification_report(y, y_p)))
+    print(log[-1])
+    data.write_log(log)
 
 if __name__ == '__main__':
     #run_rnn()
