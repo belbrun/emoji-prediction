@@ -1,8 +1,19 @@
 import sklearn
 import numpy as np
+import re
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.feature_selection import SelectKBest, chi2
+
+def preprocess_tweet(text):
+    new_text = []
+    for word in text:
+        new_word = re.sub('[#@\.\!\?]+', '', word)
+        new_word = re.sub(r'([a-z])\1{3,}', r'\1', new_word) 
+        new_word = new_word.strip()
+        if len(new_word) > 0:
+            new_text.append(new_word.lower())
+    return new_text
 
 class Preprocess():
 
