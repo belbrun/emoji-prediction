@@ -2,6 +2,7 @@ import data
 import preprocess
 import model
 import joblib
+import torch.nn as nn
 import feature_extraction as fe
 
 from preprocess import Preprocess
@@ -50,35 +51,54 @@ class BaselinePipeline(Pipeline):
 
 class RNNPipeline(Pipeline):
 
-    def __init__(self):
+    def __init__(self, hidden_size, num_layers, dropout, f_size, text_field, embedding_dim):
         super().__init__()
         self.preprocess = None
-        self.embedding_dim = 100
-        self.embeddings = data.load_embeddings()
-        self.embedd = data.embedd_sentences
-        self.text_features = fe.text_features
-        self.word_features = fe.word_features
-        self.model = RNN()
+        self.embedding_dim = embedding_dim
+        pre_trained_emb = torch.FloatTensor(text_field.vocab.vectors)
+        self.embedding = nn.Embedding.from_pretrained(pre_trained_emb)
+        
+        self.text_field = text_field
+        self.model = RNN(embedding_dim, hidden_size, num_layers, dropout, f_size)
+
+    def embedd(self, batch_text):
+        final_embedding = []
+        for text in batch_text:
+            text_embedding = []
+            for word in text:
+                e = self.embedding(word)
+                text_embedding.append(e.tolist())
+            
+            final_embedding.append(text_embedding)
+            
+        return torch.Tensor(final_embedding)
 
     def train(self, data):
         avg_loss = 0
         for _, batch in enumerate(data):
-            words, labels = batch
-            x = self.embedd(self.embeddings, self.embedding_dim, words)
-            x = torch.cat((x, self.word_features(words)), dim=1)
-            f = self.word_features(words)
-            avg_loss += self.model.train(x, f)
+            x = batch.text.T
+            y = batch.label
+
+            #text features
+            f = batch.text_f
+            x = self.embedd(x)
+            
+            avg_loss += self.model.train_model((x, y, f))
+        
         return avg_loss/len(data)
 
     def evaluate(self, data):
         y_ps, y_s = [], []
         for _, batch in enumerate(data):
-            words, labels = batch
-            y_s.append(labels)
-            x = self.embedd(words)
-            x = torch.cat((x, self.word_features(words)), dim=2)
-            f = self.text_features(words)
+            x = batch.text
+            y = batch.label
+
+            f = batch.text_f
+            x = self.embedd(x)
+            
             y_ps.append(self.model.evaluate(x, f))
+            y_s.append(y)
+        
         y_p = torch.cat(y_ps, dim=0)
-        y = torch.cat(ys, dim=0)
+        y = torch.cat(y_s, dim=0)
         return (y_p, y)

@@ -32,8 +32,10 @@ class Baseline(Model):
 
 class RNN(nn.Module):
 
-    def __init__(self):
-        super().__init__(input_size, hidden_size, num_layers, dropout, f_size)
+    def __init__(self, input_size, hidden_size, num_layers, dropout, f_size):
+        #TODO
+        #the arguments for super?
+        super().__init__(hidden_size, num_layers, dropout, f_size)
         self.activation = nn.ReLU()
         self.criterion = nn.CrossEntropyLoss()
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
@@ -53,18 +55,19 @@ class RNN(nn.Module):
         x = self.fc2(x)
         return x
 
-    def train(self, batch):
+    def train_model(self, batch):
+        #if the method is called train, the self.train() does not work 
         self.train()
         self.zero_grad()
         x, y, f = batch
         logits = self(x, f)
         loss = self.criterion(logits, y)
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 0.1)
-        optimizer.step()
+        torch.nn.utils.clip_grad_norm_(self.parameters(), 0.1)
+        self.optimizer.step()
         return loss.detach().item()
 
-    def evaluate(self, x, f):
+    def evaluate_(self, x, f):
         self.eval()
         with torch.no_grad():
             return self(x, f)
