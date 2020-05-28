@@ -3,6 +3,7 @@ import pipeline
 import sklearn
 import numpy as np
 import time
+import joblib
 
 from sklearn.metrics import classification_report
 from pipeline import BaselinePipeline, RNNPipeline
@@ -44,8 +45,17 @@ def run_rnn():
     train_dataset = data.get_dataset(train_data, text_field, label_field)
     train_iter = data.get_iterator(train_dataset, 10)
 
-    model_pipeline = RNNPipeline(150, 1, 0, 5, text_field, 100)
+    model_pipeline = RNNPipeline(150, 1, 0, 7, text_field, 100)
     model_pipeline.train(train_iter)
+    #model_pipeline.load_model()
+
+    test_data = data.load_data('trial')
+    test_data = data.add_features(test_data)
+
+    test_dataset = data.get_dataset(test_data, text_field, label_field)
+    test_iter = data.get_iterator(test_dataset, 32)
+
+    model_pipeline.evaluate(test_iter)
 
 '''
 params = {

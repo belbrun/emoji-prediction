@@ -18,8 +18,12 @@ def read_file(path):
 def load_data(set='test'):
     X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))
     y = read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels'))
+    
     d = {'text':X, 'label':y}
-    return pd.DataFrame(data=d)
+    df = pd.DataFrame(data=d)
+    df = df.drop(df[df.label == ''].index)
+    
+    return df
 
 def get_text_field(text):
     field = Field(
@@ -45,12 +49,14 @@ def get_label_field():
 
 class SemEvalDataset(Dataset):
     def __init__(self, data, fields):
-        self.fields = fields
         e = [
                 Example.fromlist(list(r), fields) 
                 for i, r in data.iterrows()
             ]
         super(SemEvalDataset, self).__init__(e, fields)
+
+    def __len__(self):
+        return len(self.examples)
 
 def get_dataset(data, text_field, label_field):
     fields = [('text',text_field), ('label',label_field), ('text_f', label_field)]

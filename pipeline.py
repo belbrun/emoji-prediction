@@ -63,7 +63,7 @@ class RNNPipeline(Pipeline):
 
     def train(self, data):
         avg_loss = 0
-        for _, batch in enumerate(data):
+        for num_batch, batch in enumerate(data):
             x = batch.text.T
             y = batch.label
 
@@ -72,19 +72,36 @@ class RNNPipeline(Pipeline):
             x = self.embedding(x)
             
             avg_loss += self.model.train_model((x, y, f))
+            if num_batch%100 == 0:
+                print('Loss:', avg_loss/(num_batch + 1)) 
         
+        try:
+            torch.save(self.model.state_dict(), 'torch_model.pt')
+        except:
+            print("error saving the model..")
         return avg_loss/len(data)
+
+    def load_model(self):
+        self.mode = torch.load('torch_model.pt')
 
     def evaluate(self, data):
         y_ps, y_s = [], []
-        for _, batch in enumerate(data):
-            x = batch.text
+        avg_loss = 0
+        for num_batch, batch in enumerate(data):
+            x = batch.text.T
             y = batch.label
 
             f = batch.text_f
-            x = self.embedd(x)
+            x = self.embedding(x)
             
-            y_ps.append(self.model.evaluate(x, f))
+            logits = self.model.evaluate(x, f)
+            with torch.no_grad():
+                loss = self.model.criterion(logits, y).item()
+                avg_loss += loss
+                if num_batch % 100 == 0:
+                    print('Loss:', avg_loss/(num_batch + 1))
+
+            y_ps.append(logits)
             y_s.append(y)
         
         y_p = torch.cat(y_ps, dim=0)
