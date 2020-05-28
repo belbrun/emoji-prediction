@@ -18,11 +18,11 @@ def read_file(path):
 def load_data(set='test'):
     X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))
     y = read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels'))
-    
+
     d = {'text':X, 'label':y}
     df = pd.DataFrame(data=d)
     df = df.drop(df[df.label == ''].index)
-    
+
     return df
 
 def get_text_field(text):
@@ -35,9 +35,9 @@ def get_text_field(text):
     preprocessed_text = text.apply(
         lambda x: field.preprocess(x)
     )
-    
+
     field.build_vocab(
-            preprocessed_text, 
+            preprocessed_text,
             vectors='glove.twitter.27B.100d'
     )
 
@@ -50,7 +50,7 @@ def get_label_field():
 class SemEvalDataset(Dataset):
     def __init__(self, data, fields):
         e = [
-                Example.fromlist(list(r), fields) 
+                Example.fromlist(list(r), fields)
                 for i, r in data.iterrows()
             ]
         super(SemEvalDataset, self).__init__(e, fields)
@@ -78,18 +78,20 @@ def add_features(data):
 
 def get_iterators(batch_size):
     iters = []
-    for set in ['train', 'valid', 'test']:
+    for set in ['train', 'trial', 'test']:
         data = load_data(set)
-        text_field = get_text_field(data['text'])
+        if set == 'train':
+            data = add_features(data)
+            text_field = get_text_field(data['text'])
         label_field = get_label_field()
         dataset = get_dataset(data, text_field, label_field)
         iters.append(get_iterator(dataset, batch_size))
-    return (iters)
+    return (iters, text_field)
 
 if __name__ == "__main__":
     train_data = load_data('test')
     train_data = add_features(train_data)
-    
+
     text_field = get_text_field(train_data.text)
     label_field = get_label_field()
 

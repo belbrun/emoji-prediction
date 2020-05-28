@@ -52,14 +52,15 @@ class BaselinePipeline(Pipeline):
 
 class RNNPipeline(Pipeline):
 
-    def __init__(self, hidden_size, num_layers, dropout, f_size, text_field, embedding_dim):
+    def __init__(self, args, text_field):
         super().__init__()
-        self.embedding_dim = embedding_dim
+        self.embedding_dim = args['embedding_dim']
         pre_trained_emb = torch.FloatTensor(text_field.vocab.vectors)
         self.embedding = nn.Embedding.from_pretrained(pre_trained_emb)
-        
+
         self.text_field = text_field
-        self.model = RNN(embedding_dim, hidden_size, num_layers, dropout, f_size)
+        self.model = RNN(args['embedding_dim'], args['hidden_size'],
+                         args['num_layers'], args['dropout'], args['f_size'])
 
     def train(self, data):
         avg_loss = 0
@@ -70,11 +71,11 @@ class RNNPipeline(Pipeline):
             #text features
             f = batch.text_f
             x = self.embedding(x)
-            
+
             avg_loss += self.model.train_model((x, y, f))
             if num_batch%100 == 0:
-                print('Loss:', avg_loss/(num_batch + 1)) 
-        
+                print('Loss:', avg_loss/(num_batch + 1))
+
         try:
             torch.save(self.model.state_dict(), 'torch_model.pt')
         except:
@@ -93,7 +94,7 @@ class RNNPipeline(Pipeline):
 
             f = batch.text_f
             x = self.embedding(x)
-            
+
             logits = self.model.evaluate(x, f)
             with torch.no_grad():
                 loss = self.model.criterion(logits, y).item()
@@ -103,7 +104,7 @@ class RNNPipeline(Pipeline):
 
             y_ps.append(logits)
             y_s.append(y)
-        
+
         y_p = torch.cat(y_ps, dim=0)
         y = torch.cat(y_s, dim=0)
         return (y_p, y)

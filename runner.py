@@ -31,14 +31,14 @@ def train_baseline():
         baseline_pipeline.save('model.sav', 'preprocess.sav')
     except:
         print('Error while trying to save the model...')
-    
-    y_pred = baseline_pipeline.run(X_test)    
+
+    y_pred = baseline_pipeline.run(X_test)
     print(classification_report(y_test, y_pred))
 
 def run_rnn():
     train_data = data.load_data('test')
     train_data = data.add_features(train_data)
-    
+
     text_field = data.get_text_field(train_data.text)
     label_field = data.get_label_field()
 
@@ -57,29 +57,29 @@ def run_rnn():
 
     model_pipeline.evaluate(test_iter)
 
-'''
+
 params = {
-    'input_size': 100,
+    'embedding_dim': 100,
     'hidden_size': 200,
     'num_layers': 3,
     'dropout': 0.1,
-    'f_size': 0
+    'f_size': 7
 }
 
 batch_size = 10
 n_epochs = 10
 
 def train_rnn():
-    train_data, valid_data, test_data = data.get_iterators(batch_size)
-    pipe = RNNPipeline(params)
+    (train_data, valid_data, test_data), text_field = data.get_iterators(batch_size)
+    pipe = RNNPipeline(params, text_field)
     for epoch in range(n_epochs):
         loss = pipe.train(train_data)
         y_p, y = pipe.evaluate(valid_data)
         print('Epoch {}\n{}\n'.format(epoch, classification_report(y, y_p)))
     y_p, y = pipe.evaluate(test_data)
     print('Test\n{}\n'.format(classification_report(y, y_p)))
-'''
+
 
 if __name__ == '__main__':
-    run_rnn()
-    #train_rnn()
+    #run_rnn()
+    train_rnn()
