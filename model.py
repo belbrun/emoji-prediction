@@ -38,6 +38,7 @@ class RNN(nn.Module):
         self.num_layers = num_layers
         self.hidden_size = hidden_size
         self.input_size = input_size
+        self.f_size = f_size
 
         self.activation = nn.ReLU()
         self.criterion = nn.CrossEntropyLoss()
@@ -52,36 +53,39 @@ class RNN(nn.Module):
         # preprocess to time first, random initi h0 and c0?
         batch_size = x.size()[0]
         x = x.permute(1, 0, 2)
-        
+
         h0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).requires_grad_()
         c0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).requires_grad_()
 
         _, (h, _) = self.lstm(x, (h0, c0))
-        
+
         hidden = h.view(self.num_layers, 2, batch_size, self.hidden_size)
         last_hidden = hidden[-1]
-        x = torch.cat((last_hidden[0], last_hidden[1], f.float()), dim=1)
-        
+        if self.f_size == 0:
+            x = torch.cat((last_hidden[0], last_hidden[1]), dim=1)
+        else:
+            x = torch.cat((last_hidden[0], last_hidden[1], f.float()), dim=1)
+
         x = self.fc1(x)
         x = self.activation(x)
         x = self.fc2(x)
-        
+
         return x
 
     def train_model(self, batch):
-        #if the method is called train, the self.train() does not work 
+        #if the method is called train, the self.train() does not work
         self.train()
         self.zero_grad()
-        
+
         x, y, f = batch
         logits = self(x, f)
-        
+
         loss = self.criterion(logits, y)
         loss.backward()
-        
+
         torch.nn.utils.clip_grad_norm_(self.parameters(), 0.1)
         self.optimizer.step()
-        
+
         return loss.detach().item()
 
     def evaluate(self, x, f):

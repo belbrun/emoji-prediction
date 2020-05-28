@@ -80,8 +80,8 @@ def get_iterators(batch_size):
     iters = []
     for set in ['train', 'trial', 'test']:
         data = load_data(set)
+        data = add_features(data)
         if set == 'train':
-            data = add_features(data)
             text_field = get_text_field(data['text'])
         label_field = get_label_field()
         dataset = get_dataset(data, text_field, label_field)

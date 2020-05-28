@@ -63,11 +63,11 @@ params = {
     'hidden_size': 200,
     'num_layers': 3,
     'dropout': 0.1,
-    'f_size': 7
+    'f_size': 0 # set to 0 to use model without additional features
 }
 
 batch_size = 10
-n_epochs = 10
+n_epochs = 5
 
 def train_rnn():
     (train_data, valid_data, test_data), text_field = data.get_iterators(batch_size)
@@ -77,6 +77,7 @@ def train_rnn():
         y_p, y = pipe.evaluate(valid_data)
         print('Epoch {}\n{}\n'.format(epoch, classification_report(y, y_p)))
     y_p, y = pipe.evaluate(test_data)
+    print(y_p.size())
     print('Test\n{}\n'.format(classification_report(y, y_p)))
 
 

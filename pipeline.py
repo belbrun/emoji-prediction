@@ -102,7 +102,7 @@ class RNNPipeline(Pipeline):
                 if num_batch % 100 == 0:
                     print('Loss:', avg_loss/(num_batch + 1))
 
-            y_ps.append(logits)
+            y_ps.append(torch.argmax(logits, dim=1))
             y_s.append(y)
 
         y_p = torch.cat(y_ps, dim=0)
