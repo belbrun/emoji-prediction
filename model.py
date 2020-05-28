@@ -1,6 +1,7 @@
 import sklearn
 import numpy as np
 import torch.nn as nn
+import torch
 
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
@@ -33,7 +34,7 @@ class Baseline(Model):
 class RNN(nn.Module):
 
     def __init__(self, input_size, hidden_size, num_layers, dropout, f_size):
-        super().__init__(input_size, hidden_size, num_layers, dropout, f_size)
+        super().__init__()
         self.activation = nn.ReLU()
         self.criterion = nn.CrossEntropyLoss()
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,

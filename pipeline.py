@@ -3,6 +3,7 @@ import preprocess
 import model
 import joblib
 import torch.nn as nn
+import torch
 import feature_extraction as fe
 
 from preprocess import Preprocess, preprocess_tweet
@@ -53,25 +54,12 @@ class RNNPipeline(Pipeline):
 
     def __init__(self, hidden_size, num_layers, dropout, f_size, text_field, embedding_dim):
         super().__init__()
-        self.preprocess = None
         self.embedding_dim = embedding_dim
         pre_trained_emb = torch.FloatTensor(text_field.vocab.vectors)
         self.embedding = nn.Embedding.from_pretrained(pre_trained_emb)
         
         self.text_field = text_field
         self.model = RNN(embedding_dim, hidden_size, num_layers, dropout, f_size)
-
-    def embedd(self, batch_text):
-        final_embedding = []
-        for text in batch_text:
-            text_embedding = []
-            for word in text:
-                e = self.embedding(word)
-                text_embedding.append(e.tolist())
-            
-            final_embedding.append(text_embedding)
-            
-        return torch.Tensor(final_embedding)
 
     def train(self, data):
         avg_loss = 0
@@ -81,7 +69,7 @@ class RNNPipeline(Pipeline):
 
             #text features
             f = batch.text_f
-            x = self.embedd(x)
+            x = self.embedding(x)
             
             avg_loss += self.model.train_model((x, y, f))
         

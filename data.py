@@ -89,3 +89,9 @@ if __name__ == "__main__":
 
     train_dataset = get_dataset(train_data, text_field, label_field)
     train_iter = get_iterator(train_dataset, 10)
+
+    for i in range(10):
+        batch = next(iter(train_iter))
+        print(batch.text)
+        print(batch.label)
+        print(batch.text_f)
