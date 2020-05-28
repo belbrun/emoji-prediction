@@ -1,6 +1,6 @@
 import os
 
-from torchtext.data import Field 
+from torchtext.data import Field
 from torchtext.data import Dataset, Example
 from torchtext.data import BucketIterator
 
@@ -23,15 +23,15 @@ def load_data(set='test'):
 def get_text_field(text):
     field =  Field(
         preprocessing=preprocess_tweet,
-        tokenize='basic_english', 
+        tokenize='basic_english',
         lower=True
     )
 
     field.build_vocab(
-            text, 
+            text,
             vectors='glove.twitter.27B.100d'
     )
-    
+
     return field
 
 def get_label_filed():
@@ -42,9 +42,9 @@ class SemEvalDataset(Dataset):
     def __init__(self, data, fields):
         super(SemEvalDataset, self).__init__(
             [
-                Example.fromlist(list(r), fields) 
+                Example.fromlist(list(r), fields)
                 for i, r in data.iterrows()
-            ], 
+            ],
             fields
         )
 

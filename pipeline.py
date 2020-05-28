@@ -50,7 +50,7 @@ class BaselinePipeline(Pipeline):
 
 class RNNPipeline(Pipeline):
 
-    def __init__(self):
+    def __init__(self, args):
         super().__init__()
         self.preprocess = None
         self.embedding_dim = 100
@@ -58,7 +58,9 @@ class RNNPipeline(Pipeline):
         self.embedd = data.embedd_sentences
         self.text_features = fe.text_features
         self.word_features = fe.word_features
-        self.model = RNN()
+        self.model = RNN(args['input_size'], args['hidden_size'],
+                         args['num_layers'], args['dropout'], args['f_size'])
+
 
     def train(self, data):
         avg_loss = 0
