@@ -4,7 +4,7 @@ import model
 import joblib
 import feature_extraction as fe
 
-from preprocess import Preprocess
+from preprocess import Preprocess, preprocess_tweet
 from model import Baseline, RNN
 
 class Pipeline():
@@ -52,7 +52,7 @@ class RNNPipeline(Pipeline):
 
     def __init__(self, args):
         super().__init__()
-        self.preprocess = None
+        self.preprocess = preprocess_tweet
         self.embedding_dim = 100
         self.embeddings = data.load_embeddings()
         self.embedd = data.embedd_sentences
@@ -66,7 +66,8 @@ class RNNPipeline(Pipeline):
         avg_loss = 0
         for _, batch in enumerate(data):
             words, labels = batch
-            x = self.embedd(self.embeddings, self.embedding_dim, words)
+            clean_words = self.preprocess(words)
+            x = self.embedd(self.embeddings, self.embedding_dim, clean_words)
             x = torch.cat((x, self.word_features(words)), dim=1)
             f = self.word_features(words)
             avg_loss += self.model.train(x, f)

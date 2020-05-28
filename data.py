@@ -59,6 +59,17 @@ def get_iterator(dataset, batch_size):
     )
     return iterator
 
+def get_iterators(batch_size):
+    iters = []
+    for set in ['train', 'valid', 'test']:
+        data = load_data(set)
+        text_field = get_text_field(data['text'])
+        label_field = get_label_filed()
+        dataset = get_dataset(data, text_field, label_field)
+        iters.append(get_iterator(dataset, batch_size))
+    return (iters)
+
+
 if __name__ == "__main__":
     train_data = load_data('train')
     text_field = get_text_field(train_data['text'])

@@ -47,10 +47,19 @@ params = {
     'f_size': 0
 }
 
+batch_size = 10
+n_epochs = 10
+
 def train_rnn():
-    #dataset =
+    train_data, valid_data, test_data = data.get_iterators(batch_size)
     pipe = RNNPipeline(params)
-    
+    for epoch in range(n_epochs):
+        loss = pipe.train(train_data)
+        y_p, y = pipe.evaluate(valid_data)
+        print('Epoch {}\n{}\n'.format(epoch, classification_report(y, y_p)))
+    y_p, y = pipe.evaluate(test_data)
+    print('Test\n{}\n'.format(classification_report(y, y_p)))
 
 
 if __name__ == '__main__':
+    train_rnn()

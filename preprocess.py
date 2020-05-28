@@ -10,7 +10,7 @@ def preprocess_tweet(text):
     for word in text:
         new_word = re.sub('[#@\.\!\?]+', '', word)
         if len(new_word) > 0:
-            new_text.append(new_word)
+            new_text.append(new_word.lower())
     return new_text
 
 class Preprocess():
