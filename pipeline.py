@@ -5,7 +5,7 @@ import joblib
 import torch.nn as nn
 import feature_extraction as fe
 
-from preprocess import Preprocess
+from preprocess import Preprocess, preprocess_tweet
 from model import Baseline, RNN
 
 class Pipeline():

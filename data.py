@@ -1,6 +1,6 @@
 import os
 
-from torchtext.data import Field, ReversibleField
+from torchtext.data import Field
 from torchtext.data import Dataset, Example
 from torchtext.data import BucketIterator
 
@@ -36,7 +36,7 @@ def get_text_field(text):
             preprocessed_text, 
             vectors='glove.twitter.27B.100d'
     )
-    
+
     return field
 
 def get_label_field():
@@ -70,6 +70,16 @@ def add_features(data):
 
     return data
 
+def get_iterators(batch_size):
+    iters = []
+    for set in ['train', 'valid', 'test']:
+        data = load_data(set)
+        text_field = get_text_field(data['text'])
+        label_field = get_label_field()
+        dataset = get_dataset(data, text_field, label_field)
+        iters.append(get_iterator(dataset, batch_size))
+    return (iters)
+
 if __name__ == "__main__":
     train_data = load_data('test')
     train_data = add_features(train_data)
@@ -79,9 +89,3 @@ if __name__ == "__main__":
 
     train_dataset = get_dataset(train_data, text_field, label_field)
     train_iter = get_iterator(train_dataset, 10)
-
-    for i in range(10):
-        batch = next(iter(train_iter))
-        print(batch.text)
-        print(batch.label)
-        print(batch.text_f, '\n')

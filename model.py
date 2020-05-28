@@ -33,9 +33,7 @@ class Baseline(Model):
 class RNN(nn.Module):
 
     def __init__(self, input_size, hidden_size, num_layers, dropout, f_size):
-        #TODO
-        #the arguments for super?
-        super().__init__(hidden_size, num_layers, dropout, f_size)
+        super().__init__(input_size, hidden_size, num_layers, dropout, f_size)
         self.activation = nn.ReLU()
         self.criterion = nn.CrossEntropyLoss()
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
