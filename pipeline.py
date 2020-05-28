@@ -53,7 +53,9 @@ class RNNPipeline(Pipeline):
     def __init__(self):
         super().__init__()
         self.preprocess = None
-        self.embedd = None #embeddings part should handle the padding for the batch
+        self.embedding_dim = 100
+        self.embeddings = data.load_embeddings()
+        self.embedd = data.embedd_sentences
         self.text_features = fe.text_features
         self.word_features = fe.word_features
         self.model = RNN()
@@ -62,7 +64,7 @@ class RNNPipeline(Pipeline):
         avg_loss = 0
         for _, batch in enumerate(data):
             words, labels = batch
-            x = self.embedd(words)
+            x = self.embedd(self.embeddings, self.embedding_dim, words)
             x = torch.cat((x, self.word_features(words)), dim=1)
             f = self.word_features(words)
             avg_loss += self.model.train(x, f)
