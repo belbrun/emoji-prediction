@@ -41,7 +41,7 @@ params = {
     'hidden_size': 200,
     'num_layers': 3,
     'dropout': 0,
-    'f_size': 0 # set to 0 to use model without additional features
+    'f_size': 0 # 8/0 - with/without additional features 
 }
 
 batch_size = 50
