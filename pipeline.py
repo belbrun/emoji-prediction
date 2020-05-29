@@ -57,6 +57,7 @@ class RNNPipeline(Pipeline):
 
     def __init__(self, args, text_field):
         super().__init__()
+        self.preprocess = preprocess_tweet
         self.embedding_dim = args['embedding_dim']
         pre_trained_emb = torch.FloatTensor(text_field.vocab.vectors)
         self.embedding = nn.Embedding.from_pretrained(pre_trained_emb)
@@ -64,7 +65,7 @@ class RNNPipeline(Pipeline):
         self.text_field = text_field
         self.model = RNN(args['embedding_dim'], args['hidden_size'],
                          args['num_layers'], args['dropout'], args['f_size'])
-        self.model.cuda()
+        self.model.to(device)
 
     def train(self, data):
         avg_loss = 0
@@ -74,7 +75,7 @@ class RNNPipeline(Pipeline):
 
             #text features
             f = batch.text_f
-            x = self.embedding(x)
+            x = self.embedding(self.preprocess(x))
 
             avg_loss += self.model.train_model((x, y, f))
             if num_batch%100 == 0:
@@ -97,7 +98,7 @@ class RNNPipeline(Pipeline):
             y = batch.label
 
             f = batch.text_f
-            x = self.embedding(x)
+            x = self.embedding(self.preprocess(x))
 
             logits = self.model.evaluate(x, f)
             with torch.no_grad():

@@ -69,10 +69,10 @@ def get_dataset(data, text_field, label_field):
     dataset = SemEvalDataset(data, fields)
     return dataset
 
-def get_iterator(dataset, batch_size):
+def get_iterator(dataset, batch_size, train):
     iterator = BucketIterator(
         dataset=dataset, batch_size=batch_size,
-        sort_key=lambda x: len(x.text), shuffle=True
+        sort_key=lambda x: len(x.text), shuffle=True, train=train
     )
     return iterator
 
@@ -91,7 +91,7 @@ def get_iterators(batch_size, embedding_dim):
             text_field = get_text_field(data['text'], embedding_dim)
         label_field = get_label_field()
         dataset = get_dataset(data, text_field, label_field)
-        iters.append(get_iterator(dataset, batch_size))
+        iters.append(get_iterator(dataset, batch_size, set == 'train'))
     return (iters, text_field)
 
 if __name__ == "__main__":
