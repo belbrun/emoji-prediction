@@ -61,6 +61,7 @@ class RNNPipeline(Pipeline):
         self.text_field = text_field
         self.model = RNN(args['embedding_dim'], args['hidden_size'],
                          args['num_layers'], args['dropout'], args['f_size'])
+        self.model.cuda()
 
     def train(self, data):
         avg_loss = 0

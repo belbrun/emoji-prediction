@@ -54,8 +54,8 @@ class RNN(nn.Module):
         batch_size = x.size()[0]
         x = x.permute(1, 0, 2)
 
-        h0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).requires_grad_()
-        c0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).requires_grad_()
+        h0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).requires_grad_().cuda()
+        c0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).requires_grad_().cuda()
 
         _, (h, _) = self.lstm(x, (h0, c0))
 
@@ -78,17 +78,17 @@ class RNN(nn.Module):
         self.zero_grad()
 
         x, y, f = batch
-        logits = self(x, f)
+        logits = self(x.cuda(), f.cuda())
 
-        loss = self.criterion(logits, y)
+        loss = self.criterion(logits, y.cuda())
         loss.backward()
 
         torch.nn.utils.clip_grad_norm_(self.parameters(), 0.1)
         self.optimizer.step()
 
-        return loss.detach().item()
+        return loss.to(device='cpu').detach().item()
 
     def evaluate(self, x, f):
         self.eval()
         with torch.no_grad():
-            return self(x, f)
+            return self(x.cuda(), f.cuda()).to(device='cpu')
