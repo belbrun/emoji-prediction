@@ -22,16 +22,16 @@ def write_log(log):
 
 
 def load_data(set='test'):
-    X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))
-    y = read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels'))
-
+    X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))[:10000]
+    y = read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels'))[:10000]
+    print(len(X), set)
     d = {'text':X, 'label':y}
     df = pd.DataFrame(data=d)
     df = df.drop(df[df.label == ''].index)
 
     return df
 
-def get_text_field(text):
+def get_text_field(text, embedding_dim):
     field = Field(
         preprocessing=preprocess_tweet,
         tokenize='basic_english',
@@ -44,7 +44,7 @@ def get_text_field(text):
 
     field.build_vocab(
             preprocessed_text,
-            vectors='glove.twitter.27B.100d'
+            vectors='glove.twitter.27B.{}d'.format(embedding_dim)
     )
 
     return field
@@ -82,13 +82,13 @@ def add_features(data):
 
     return data
 
-def get_iterators(batch_size):
+def get_iterators(batch_size, embedding_dim):
     iters = []
     for set in ['train', 'trial', 'test']:
         data = load_data(set)
         data = add_features(data)
         if set == 'train':
-            text_field = get_text_field(data['text'])
+            text_field = get_text_field(data['text'], embedding_dim)
         label_field = get_label_field()
         dataset = get_dataset(data, text_field, label_field)
         iters.append(get_iterator(dataset, batch_size))

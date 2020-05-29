@@ -41,7 +41,9 @@ class RNN(nn.Module):
         self.f_size = f_size
 
         self.activation = nn.ReLU()
-        self.criterion = nn.CrossEntropyLoss()
+        self.eval_criterion =  nn.CrossEntropyLoss()
+        self.criterion = nn.CrossEntropyLoss(weight=torch.Tensor(
+            [0.15, 0.4, 0.4, 0.5, 0.5, 0.5, 0.5, 0.7, 0.8, 0.9, 0.9, 0.9, 0.9, 1, 1, 1, 1, 1, 1, 1]).cuda())
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
                             num_layers=num_layers, dropout=dropout,
                             bidirectional=True)
@@ -79,7 +81,7 @@ class RNN(nn.Module):
 
         x, y, f = batch
         logits = self(x.cuda(), f.cuda())
-
+        #print(logits[2], torch.argmax(logits, dim=1)[2], y)
         loss = self.criterion(logits, y.cuda())
         loss.backward()
 

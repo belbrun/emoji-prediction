@@ -98,7 +98,7 @@ class RNNPipeline(Pipeline):
 
             logits = self.model.evaluate(x, f)
             with torch.no_grad():
-                loss = self.model.criterion(logits, y).item()
+                loss = self.model.eval_criterion(logits, y).item()
                 avg_loss += loss
                 if num_batch % 100 == 0:
                     print('Loss:', avg_loss/(num_batch + 1))
