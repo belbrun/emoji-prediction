@@ -8,6 +8,9 @@ from sklearn.svm import SVC
 from sklearn.svm import LinearSVC
 from sklearn.metrics import classification_report, f1_score
 
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 class Model():
 
     def __init__(self):
@@ -43,7 +46,7 @@ class RNN(nn.Module):
         self.activation = nn.ReLU()
         self.eval_criterion =  nn.CrossEntropyLoss()
         self.criterion = nn.CrossEntropyLoss(weight=torch.Tensor(
-            [0.15, 0.3, 0.3, 0.4, 0.4, 0.4, 0.4, 0.6, 0.7, 0.9, 0.9, 0.9, 0.9, 1, 1, 1, 1, 1, 1, 1]).cuda())
+            [0.15, 0.3, 0.3, 0.4, 0.4, 0.4, 0.4, 0.6, 0.7, 0.9, 0.9, 0.9, 0.9, 1, 1, 1, 1, 1, 1, 1]).to(device))
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
                             num_layers=num_layers, dropout=dropout,
                             bidirectional=True)
@@ -57,8 +60,8 @@ class RNN(nn.Module):
         batch_size = x.size()[0]
         x = x.permute(1, 0, 2)
 
-        h0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).requires_grad_().cuda()
-        c0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).requires_grad_().cuda()
+        h0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).requires_grad_().to(device)
+        c0 = torch.zeros(self.num_layers * 2, batch_size, self.hidden_size).requires_grad_().to(device)
 
         _, (h, _) = self.lstm(x, (h0, c0))
 
@@ -83,9 +86,9 @@ class RNN(nn.Module):
         self.zero_grad()
 
         x, y, f = batch
-        logits = self(x.cuda(), f.cuda())
+        logits = self(x.to(device), f.to(device))
         #print(logits[2], torch.argmax(logits, dim=1)[2], y)
-        loss = self.criterion(logits, y.cuda())
+        loss = self.criterion(logits, y.to(device))
         loss.backward()
 
         #torch.nn.utils.clip_grad_norm_(self.parameters(), 0.1)
@@ -96,4 +99,4 @@ class RNN(nn.Module):
     def evaluate(self, x, f):
         self.eval()
         with torch.no_grad():
-            return self(x.cuda(), f.cuda()).to(device='cpu')
+            return self(x.to(device), f.to(device)).to(device='cpu')

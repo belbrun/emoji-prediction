@@ -9,6 +9,9 @@ import feature_extraction as fe
 from preprocess import Preprocess, preprocess_tweet
 from model import Baseline, RNN
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+
 class Pipeline():
 
     def __init__(self):

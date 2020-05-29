@@ -44,7 +44,7 @@ params = {
     'f_size': 0 # set to 0 to use model without additional features
 }
 
-batch_size = 100
+batch_size = 50
 n_epochs = 20
 
 def train_rnn():
