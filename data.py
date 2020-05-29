@@ -22,8 +22,8 @@ def write_log(log):
 
 
 def load_data(set='test'):
-    X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))[:10000]
-    y = read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels'))[:10000]
+    X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))
+    y = read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels'))
     print(len(X), set)
     d = {'text':X, 'label':y}
     df = pd.DataFrame(data=d)
@@ -72,7 +72,7 @@ def get_dataset(data, text_field, label_field):
 def get_iterator(dataset, batch_size):
     iterator = BucketIterator(
         dataset=dataset, batch_size=batch_size,
-        sort_key=lambda x: len(x.text),
+        sort_key=lambda x: len(x.text), shuffle=True
     )
     return iterator
 

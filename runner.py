@@ -37,15 +37,15 @@ def train_baseline():
     print(classification_report(y_test, y_pred))
 
 params = {
-    'embedding_dim': 200,
+    'embedding_dim': 100,
     'hidden_size': 200,
     'num_layers': 3,
     'dropout': 0,
-    'f_size': 7 # set to 0 to use model without additional features
+    'f_size': 0 # set to 0 to use model without additional features
 }
 
 batch_size = 100
-n_epochs = 10
+n_epochs = 20
 
 def train_rnn():
     log = []
