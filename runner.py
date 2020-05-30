@@ -40,13 +40,8 @@ params = {
     'embedding_dim': 100,
     'hidden_size': 150,
     'num_layers': 3,
-<<<<<<< HEAD
     'dropout': 0.05,
     'f_size': 0 # set to 0 to use model without additional features
-=======
-    'dropout': 0,
-    'f_size': 0 # 8/0 - with/without additional features 
->>>>>>> 50bfb98172a7a1c71938bd907f8195a092405df3
 }
 
 batch_size = 32
