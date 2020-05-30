@@ -57,7 +57,6 @@ class RNNPipeline(Pipeline):
 
     def __init__(self, args, text_field):
         super().__init__()
-        self.preprocess = preprocess_tweet
         self.embedding_dim = args['embedding_dim']
         pre_trained_emb = torch.FloatTensor(text_field.vocab.vectors)
         self.embedding = nn.Embedding.from_pretrained(pre_trained_emb)
@@ -75,7 +74,7 @@ class RNNPipeline(Pipeline):
 
             #text features
             f = batch.text_f
-            x = self.embedding(self.preprocess(x))
+            x = self.embedding(x)
 
             avg_loss += self.model.train_model((x, y, f))
             if num_batch%100 == 0:
@@ -98,7 +97,7 @@ class RNNPipeline(Pipeline):
             y = batch.label
 
             f = batch.text_f
-            x = self.embedding(self.preprocess(x))
+            x = self.embedding(x)
 
             logits = self.model.evaluate(x, f)
             with torch.no_grad():

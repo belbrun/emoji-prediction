@@ -2,6 +2,7 @@ import sklearn
 import numpy as np
 import torch.nn as nn
 import torch
+import data
 
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
@@ -42,17 +43,16 @@ class RNN(nn.Module):
         self.hidden_size = hidden_size
         self.input_size = input_size
         self.f_size = f_size
-
         self.activation = nn.ReLU()
         self.eval_criterion =  nn.CrossEntropyLoss()
         self.criterion = nn.CrossEntropyLoss(weight=torch.Tensor(
-            [0.15, 0.3, 0.3, 0.4, 0.4, 0.4, 0.4, 0.6, 0.7, 0.9, 0.9, 0.9, 0.9, 1, 1, 1, 1, 1, 1, 1]).to(device))
+            data.class_weights()).to(device))
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
                             num_layers=num_layers, dropout=dropout,
                             bidirectional=True)
         self.fc1 = nn.Linear(hidden_size*2 + f_size, 200)
-        self.fc2 = nn.Linear(200, 100)
-        self.fc3 = nn.Linear(100, 20)
+        self.fc2 = nn.Linear(200, 20)
+        #self.fc3 = nn.Linear(100, 20)
         self.optimizer = torch.optim.SGD(self.parameters(), lr=0.1)
 
     def forward(self, x, f):
@@ -75,8 +75,8 @@ class RNN(nn.Module):
         x = self.fc1(x)
         x = self.activation(x)
         x = self.fc2(x)
-        x = self.activation(x)
-        x = self.fc3(x)
+        #x = self.activation(x)
+        #x = self.fc3(x)
 
         return x
 
@@ -91,7 +91,7 @@ class RNN(nn.Module):
         loss = self.criterion(logits, y.to(device))
         loss.backward()
 
-        #torch.nn.utils.clip_grad_norm_(self.parameters(), 0.1)
+        #torch.nn.utils.clip_grad_norm_(self.parameters(), 0.05)
         self.optimizer.step()
 
         return loss.to(device='cpu').detach().item()

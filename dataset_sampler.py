@@ -1,7 +1,17 @@
 import os
 import numpy as np
 
+join = [[0, 3, 8, 13], [10, 18]]
+def join_classes(labels, groups):
+    for i, label in enumerate(labels):
+        l = int(label)
+        for group in groups:
+            if l in group:
+                labels[i] = (str(min(group)))
+            else:
 
+                (str(l - count([l > x for x in group]))
+    return new_labels
 dataset_path = 'dataset/Semeval2018-Task2-EmojiPrediction'
 
 def read_file(path):

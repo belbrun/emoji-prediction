@@ -38,14 +38,14 @@ def train_baseline():
 
 params = {
     'embedding_dim': 100,
-    'hidden_size': 200,
+    'hidden_size': 150,
     'num_layers': 3,
     'dropout': 0.05,
     'f_size': 0 # set to 0 to use model without additional features
 }
 
 batch_size = 32
-n_epochs = 30
+n_epochs = 50
 
 def train_rnn():
     log = []
@@ -66,7 +66,7 @@ def train_rnn():
     print(log[-1])
     data.write_log(log)
 
-seed = 32141441
+seed = 12345
 if __name__ == '__main__':
     np.random.seed(seed)
     torch.manual_seed(seed)

@@ -31,6 +31,13 @@ def load_data(set='test'):
 
     return df
 
+def class_weights():
+    df = load_data()
+    counts = np.zeros(20)
+    for yi in df['label']:
+        counts[int(yi)] += 1
+    return np.power(counts,-1)*np.max(counts)
+
 def get_text_field(text, embedding_dim):
     field = Field(
         preprocessing=preprocess_tweet,
@@ -82,10 +89,15 @@ def add_features(data):
 
     return data
 
-def get_iterators(batch_size, embedding_dim):
+
+
+
+def get_iterators(batch_size, embedding_dim, join=None):
     iters = []
     for set in ['train', 'trial', 'test']:
         data = load_data(set)
+        if join:
+            join_classes(data, join)
         data = add_features(data)
         if set == 'train':
             text_field = get_text_field(data['text'], embedding_dim)
