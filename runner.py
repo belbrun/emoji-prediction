@@ -40,12 +40,12 @@ params = {
     'embedding_dim': 100,
     'hidden_size': 150,
     'num_layers': 3,
-    'dropout': 0.05,
+    'dropout': 0.1,
     'f_size': 0 # set to 0 to use model without additional features
 }
 
 batch_size = 32
-n_epochs = 50
+n_epochs = 25
 
 def train_rnn():
     log = []

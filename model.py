@@ -91,7 +91,7 @@ class RNN(nn.Module):
         loss = self.criterion(logits, y.to(device))
         loss.backward()
 
-        #torch.nn.utils.clip_grad_norm_(self.parameters(), 0.05)
+    #    torch.nn.utils.clip_grad_norm_(self.parameters(), 0.05)
         self.optimizer.step()
 
         return loss.to(device='cpu').detach().item()
