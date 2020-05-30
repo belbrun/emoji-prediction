@@ -8,7 +8,10 @@ from sklearn.feature_selection import SelectKBest, chi2
 def preprocess_tweet(text):
     new_text = []
     for word in text:
-        new_word = re.sub('[#@\.\!\?]+', '', word)
+        if word == '@user':
+            new_word = '<user>'
+        else:
+            new_word = re.sub('[^A-Za-z0-9]+', '', word)
         new_word = new_word.strip()
         if len(new_word) > 0:
             new_text.append(new_word.lower())

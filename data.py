@@ -41,7 +41,6 @@ def class_weights():
 def get_text_field(text, embedding_dim):
     field = Field(
         preprocessing=preprocess_tweet,
-        tokenize='basic_english',
         lower=True
     )
 
