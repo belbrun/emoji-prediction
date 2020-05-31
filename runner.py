@@ -38,14 +38,14 @@ def train_baseline():
 
 params = {
     'embedding_dim': 100,
-    'hidden_size': 150,
+    'hidden_size': 200,
     'num_layers': 3,
-    'dropout': 0.05,
-    'f_size': 0 # set to 0 to use model without additional features
+    'dropout': 0,
+    'f_size': 8 # set to 0 to use model without additional features
 }
 
-batch_size = 32
-n_epochs = 50
+batch_size = 100
+n_epochs = 20
 
 def train_rnn():
     log = []
@@ -56,6 +56,11 @@ def train_rnn():
         loss = pipe.train(train_data)
         y_p, y = pipe.evaluate(valid_data)
         log.append('Epoch {}\nLoss: {}\n{}\n{}\n'.\
+                   format(epoch, loss, classification_report(y, y_p),
+                          confusion_matrix(y, y_p)))
+        print(log[-1])
+        y_p, y = pipe.evaluate(test_data)
+        log.append('Test {}\nLoss: {}\n{}\n{}\n'.\
                    format(epoch, loss, classification_report(y, y_p),
                           confusion_matrix(y, y_p)))
         print(log[-1])

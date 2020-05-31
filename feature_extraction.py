@@ -4,15 +4,19 @@ import pandas as pd
 import numpy as np
 
 def has_ellipsis(text):
-    matches = re.findall(r'[.][.][.]', text)
+    matches = re.findall(r'([\.]){3,}', text)
     return len(matches)
 
 def has_char_repetition(text):
     matches = re.findall(r'([a-zA-Z])(\1{3,})', text)
     return len(matches)
 
-def has_exclamation_repetition(text):
-    matches = re.findall(r'[!]{2,}', text)
+def has_exclamation(text):
+    matches = re.findall(r'[!]', text)
+    return len(matches)
+
+def has_questionmark(text):
+    matches = re.findall(r'[\?]', text)
     return len(matches)
 
 def has_user(text):
@@ -28,14 +32,15 @@ def has_hashtag(text):
     return len(matches)
 
 def has_caps_lock_words(text):
-    matches = re.findall(r'\b[A-Z]{3,}\b', text)
+    matches = re.findall(r'\b[A-Z]+\b', text)
     return len(matches)
 
 def make_feature_vector(x):
     features = []
     features.append(has_ellipsis(x))
     features.append(has_char_repetition(x))
-    features.append(has_exclamation_repetition(x))
+    features.append(has_exclamation(x))
+    features.append(has_questionmark(x))
     has_user_value = has_user(x)
     features.append(has_user_value)
     features.append(has_location(x) - has_user_value)
