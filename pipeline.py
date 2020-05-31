@@ -29,13 +29,13 @@ class Pipeline():
 
 class BaselinePipeline(Pipeline):
 
-    def __init__(self, C, k):
+    def __init__(self, C):
         super().__init__()
-        self.preprocess = Preprocess(k=k)
+        self.preprocess = Preprocess()
         self.model = Baseline(C=C)
 
-    def train(self, X_train, y_train, max_n_gram=4):
-        X = self.preprocess.train(X_train, y_train, max_n_gram)
+    def train(self, X_train, y_train, max_n_gram=1, add_special=False, use_tf_idf=False, do_preprocess=True):
+        X = self.preprocess.train(X_train, y_train, max_n_gram, add_special, use_tf_idf, do_preprocess)
         self.model.train(X, y_train)
 
     def run(self, X_test):

@@ -20,6 +20,20 @@ def write_log(log):
         for line in log:
             file.write(str(line)+'\n')
 
+def load_raw_data(set='test', is_subset=True):
+    if is_subset and set=='train':
+        X = np.array(read_file(os.path.join(dataset_path, 'train', 'us_train_s.text')))
+        y = np.array(read_file(os.path.join(dataset_path, 'train', 'us_train_s.labels')))
+    else:
+        X = np.array(read_file(os.path.join(dataset_path, set, 'us_' + set + '.text')))
+        y = np.array(read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels')))
+
+    mask = y != ''
+    X = X[mask]
+    y = y[mask]
+
+    return X, y.astype(np.int64)
+
 
 def load_data(set='test'):
     X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))
@@ -88,15 +102,10 @@ def add_features(data):
 
     return data
 
-
-
-
 def get_iterators(batch_size, embedding_dim, join=None):
     iters = []
     for set in ['train', 'trial', 'test']:
         data = load_data(set)
-        if join:
-            join_classes(data, join)
         data = add_features(data)
         if set == 'train':
             text_field = get_text_field(data['text'], embedding_dim)
@@ -104,19 +113,3 @@ def get_iterators(batch_size, embedding_dim, join=None):
         dataset = get_dataset(data, text_field, label_field)
         iters.append(get_iterator(dataset, batch_size, set == 'train'))
     return (iters, text_field)
-
-if __name__ == "__main__":
-    train_data = load_data('test')
-    train_data = add_features(train_data)
-
-    text_field = get_text_field(train_data.text)
-    label_field = get_label_field()
-
-    train_dataset = get_dataset(train_data, text_field, label_field)
-    train_iter = get_iterator(train_dataset, 10)
-
-    for i in range(10):
-        batch = next(iter(train_iter))
-        print(batch.text)
-        print(batch.label)
-        print(batch.text_f)

@@ -56,3 +56,10 @@ def make_feature_matrix(X):
         feature_col.append(f_vector)
 
     return pd.Series(feature_col)
+
+def make_feature_matrix_baseline(X):
+    feature_col = []
+    for x in X:
+        f_vector = make_feature_vector(x)
+        feature_col.append(f_vector)
+    return np.array(feature_col)
