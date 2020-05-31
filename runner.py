@@ -5,6 +5,8 @@ import numpy as np
 import time
 import joblib
 import torch
+import matplotlib.pyplot as plt
+
 
 from sklearn.metrics import classification_report, confusion_matrix
 from pipeline import BaselinePipeline, RNNPipeline
@@ -39,19 +41,20 @@ def train_baseline():
 params = {
     'embedding_dim': 100,
     'hidden_size': 200,
-    'num_layers': 3,
-    'dropout': 0,
+    'num_layers': 2,
+    'dropout': 0.5,
     'f_size': 8 # set to 0 to use model without additional features
 }
 
-batch_size = 100
-n_epochs = 20
+batch_size = 32
+n_epochs = 19
 
 def train_rnn():
     log = []
     (train_data, valid_data, test_data), text_field = \
                 data.get_iterators(batch_size, params['embedding_dim'])
     pipe = RNNPipeline(params, text_field)
+    #pipe.load_model()
     for epoch in range(n_epochs):
         loss = pipe.train(train_data)
         y_p, y = pipe.evaluate(valid_data)
@@ -71,8 +74,36 @@ def train_rnn():
     print(log[-1])
     data.write_log(log)
 
+def eval_models():
+    (train_data, valid_data, test_data), text_field = \
+                data.get_iterators(batch_size, params['embedding_dim'])
+    for f in [0, 8]:
+        params['f_size'] = f
+        pipe = RNNPipeline(params, text_field)
+        pipe.load_model('torch_model{}.pt'.format(f))
+        y_p, y = pipe.evaluate(test_data)
+        print('Epoch {}\n{}\n{}\n'.\
+                   format('TEST', classification_report(y, y_p),
+                          confusion_matrix(y, y_p)))
+
+
+def see_w():
+    (train_data, valid_data, test_data), text_field = \
+            data.get_iterators(batch_size, params['embedding_dim'])
+    pipe = RNNPipeline(params, text_field)
+    pipe.load_model('torch_model8.pt')
+    w = pipe.model.get_f_weights().detach().cpu()
+    for i in range(8):
+        plt.subplot(str(420+i))
+        plt.hist(w[:,i], bins=20)
+    plt.show()
+
+
+
 seed = 12345
 if __name__ == '__main__':
     np.random.seed(seed)
     torch.manual_seed(seed)
-    train_rnn()
+    #train_rnn()
+    #eval_models()
+    see_w()

@@ -86,8 +86,8 @@ class RNNPipeline(Pipeline):
             print("error saving the model..")
         return avg_loss/len(data)
 
-    def load_model(self):
-        self.mode = torch.load('torch_model.pt')
+    def load_model(self, name):
+        self.model.load_state_dict(torch.load(name))
 
     def evaluate(self, data):
         y_ps, y_s = [], []

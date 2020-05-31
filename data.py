@@ -22,8 +22,8 @@ def write_log(log):
 
 
 def load_data(set='test'):
-    X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))
-    y = read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels'))
+    X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))[:1]
+    y = read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels'))[:1]
     print(len(X), set)
     d = {'text':X, 'label':y}
     df = pd.DataFrame(data=d)

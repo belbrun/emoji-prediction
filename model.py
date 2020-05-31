@@ -100,3 +100,7 @@ class RNN(nn.Module):
         self.eval()
         with torch.no_grad():
             return self(x.to(device), f.to(device)).to(device='cpu')
+
+    def get_f_weights(self):
+        print(self.fc1.weight.shape)
+        return self.fc1.weight[:, 200:208]
