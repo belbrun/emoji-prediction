@@ -112,3 +112,9 @@ class RNNPipeline(Pipeline):
         y_p = torch.cat(y_ps, dim=0)
         y = torch.cat(y_s, dim=0)
         return (y_p, y)
+
+    def demo(self, x, k=3):
+        for batch in x:
+            x = self.embedding(batch.text.T)
+            logits = self.model.evaluate(x, batch.text_f)
+            return torch.topk(logits, k=k, dim=1)[1]

@@ -6,7 +6,7 @@ import time
 import joblib
 import torch
 import matplotlib.pyplot as plt
-
+import pandas as pd
 
 from sklearn.metrics import classification_report, confusion_matrix
 from pipeline import BaselinePipeline, RNNPipeline
@@ -98,7 +98,22 @@ def see_w():
         plt.hist(w[:,i], bins=20)
     plt.show()
 
-
+def demo():
+    examples = ['Ooo oo im on fire', 'Play that funky music white boy',
+                'Jingle bells, jingle bells, jingle bells rock',
+                'Its a lovely evening', 'Money, its a trap', 'Trump elected again - angry doesnt even begin to describe it']
+    l_proxy = ['0' for i in range(len(examples))]
+    d = {'text':examples, 'label':l_proxy}
+    df = pd.DataFrame(data=d)
+    iter, tf = data.get_demo_iterator(df, len(examples), params['embedding_dim'])
+    for f in [0, 8]:
+        print('Features: {}'.format('off' if f==0 else 'on'))
+        params['f_size'] = f
+        pipe = RNNPipeline(params, tf)
+        pipe.load_model('torch_model{}.pt'.format(f))
+        predictions = pipe.demo(iter)
+        for i, example in enumerate(examples):
+            print('{} | emojis: {}'.format(example, predictions[i]))
 
 seed = 12345
 if __name__ == '__main__':
@@ -106,4 +121,5 @@ if __name__ == '__main__':
     torch.manual_seed(seed)
     #train_rnn()
     #eval_models()
-    see_w()
+    #see_w()
+    demo()

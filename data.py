@@ -22,9 +22,9 @@ def write_log(log):
 
 
 def load_data(set='test'):
-    X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))[:1]
-    y = read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels'))[:1]
-    print(len(X), set)
+    X = read_file(os.path.join(dataset_path, set, 'us_' + set + '.text'))[:1000]
+    y = read_file(os.path.join(dataset_path, set, 'us_' + set + '.labels'))[:1000]
+    #print(len(X), set)
     d = {'text':X, 'label':y}
     df = pd.DataFrame(data=d)
     df = df.drop(df[df.label == ''].index)
@@ -45,10 +45,10 @@ def get_text_field(text, embedding_dim):
         lower=True
     )
 
-    preprocessed_text = text.apply(
-        lambda x: field.preprocess(x)
-    )
-
+    #preprocessed_text = text.apply(
+    #    lambda x: field.preprocess(x)
+    #)
+    preprocessed_text = preprocess_tweet(text)
     field.build_vocab(
             preprocessed_text,
             vectors='glove.twitter.27B.{}d'.format(embedding_dim)
@@ -90,14 +90,18 @@ def add_features(data):
     return data
 
 
+def get_demo_iterator(data, batch_size, embedding_dim):
+    data = add_features(data)
+    text_field = get_text_field(data['text'], embedding_dim)
+    label_field = get_label_field()
+    dataset = get_dataset(data, text_field, label_field)
+    return (get_iterator(dataset, batch_size, set == 'train'), text_field)
 
-
-def get_iterators(batch_size, embedding_dim, join=None):
+def get_iterators(batch_size, embedding_dim, vocab_only=False):
     iters = []
-    for set in ['train', 'trial', 'test']:
+    sets = ['train'] if vocab_only else ['train', 'trial', 'test']
+    for set in sets:
         data = load_data(set)
-        if join:
-            join_classes(data, join)
         data = add_features(data)
         if set == 'train':
             text_field = get_text_field(data['text'], embedding_dim)
